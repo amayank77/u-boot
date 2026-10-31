@@ -68,6 +68,13 @@ static int dm_test_gpio(struct unit_test_state *uts)
 	ut_assertok(gpio_get_status(dev, offset, buf, sizeof(buf)));
 	ut_asserteq_str("b4: output: 1 [x] testing", buf);
 
+	/* A GPIO already requested must reject another request */
+	ut_asserteq(-EBUSY, gpio_request(gpio, "duplicate"));
+
+	/* The original owner must remain unchanged */
+	ut_assertok(gpio_get_status(dev, offset, buf, sizeof(buf)));
+	ut_asserteq_str("b4: output: 1 [x] testing", buf);
+
 	/* Change the value a bit */
 	ut_asserteq(1, ops->get_value(dev, offset));
 	ut_assertok(ops->set_value(dev, offset, 0));
